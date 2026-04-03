@@ -1,45 +1,35 @@
 import * as VueRouter from 'vue-router'
 import { RouteRecordRaw } from 'vue-router'
-import Layout from '@/layout/default.vue'
 import words from '@/pages/(words)/words.vue'
 import Dict from '@/pages/(words)/dict.vue'
 import DictList from '@/pages/(words)/dict-list.vue'
 import PracticeWords from '@/pages/(words)/practice-words/[id].vue'
 import WordTest from '@/pages/(words)/words-test/[id].vue'
 
-import articles from '@/pages/(articles)/articles.vue'
-import BookDetail from '@/pages/(articles)/book/index.vue'
-import BookList from '@/pages/(articles)/book-list.vue'
-import PracticeArticles from '@/pages/(articles)/practice-articles/[id].vue'
+// import articles from '@/pages/(articles)/articles.vue'
+// import BookDetail from '@/pages/(articles)/book/index.vue'
+// import BookList from '@/pages/(articles)/book-list.vue'
+// import PracticeArticles from '@/pages/(articles)/practice-articles/[id].vue'
 
 import setting from '@/pages/setting.vue'
-import login from '@/pages/(user)/login.vue'
-import user from '@/pages/(user)/user.vue'
-// import { useAuthStore } from "@/stores/user";
 
 export const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    component: Layout,
-    children: [
-      { path: '/', redirect: '/words' },
-      { path: 'words', component: words },
-      { path: 'word', redirect: '/words' },
-      { path: 'practice-words/:id', component: PracticeWords },
-      { path: 'word-test/:id', component: WordTest },
-      { path: 'study-word', redirect: '/words' },
-      { path: 'dict-list', component: DictList },
-      { path: 'dict', component: Dict },
+  { path: '/', redirect: '/words' },
+  { path: '/words', component: words },
+  { path: '/word', redirect: '/words' },
+  { path: '/practice-words/:id', component: PracticeWords },
+  { path: '/word-test/:id', component: WordTest },
+  { path: '/study-word', redirect: '/words' },
+  { path: '/dict-list', component: DictList },
+  { path: '/dict', component: Dict },
 
-      { path: 'articles', component: articles },
-      { path: 'article', redirect: '/articles' },
-      { path: 'practice-articles/:id', component: PracticeArticles },
-      { path: 'study-article', redirect: '/articles' },
-      { path: 'book', component: BookDetail },
-      { path: 'book-list', component: BookList },
-      { path: 'setting', component: setting },
-    ],
-  },
+  // { path: '/articles', component: articles },
+  // { path: '/article', redirect: '/articles' },
+  // { path: '/practice-articles/:id', component: PracticeArticles },
+  // { path: '/study-article', redirect: '/articles' },
+  // { path: '/book', component: BookDetail },
+  // { path: '/book-list', component: BookList },
+  { path: '/setting', component: setting },
   { path: '/:pathMatch(.*)*', redirect: '/words' },
 ]
 

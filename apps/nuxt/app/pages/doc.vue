@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import BasePage from '@/components/BasePage.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import ResourceCard from '@/components/ResourceCard.vue'
-import { APP_NAME, Origin } from '~/config/env.ts'
+import { BaseButton, BasePage } from '@typewords/base'
+import ResourceCard from '@typewords/core/components/ResourceCard.vue'
+import { APP_NAME, Origin } from '@typewords/core/config/env.ts'
 
 let route = useRoute()
 let title = APP_NAME + ' 英语学习资源分享'
@@ -183,8 +182,8 @@ const categories = ref<Category[]>([
           //   link: 'https://pan.baidu.com/s/xxx',
           // },
           {
-            name: '旋元估文法',
-            author: '旋元估',
+            name: '旋元佑语法',
+            author: '旋元佑',
             features: '以通俗易懂的语言解析复杂语法，强调“理解逻辑”，适合突破语法难点',
             suitable: '对传统语法教学感到枯燥，想轻松掌握核心逻辑的学习者',
             difficulty: '繁体中文版',

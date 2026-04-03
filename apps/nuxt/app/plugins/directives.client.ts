@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import LoadingOverlay from '@/components/base/Loading.vue'
+import { Loading } from '@typewords/base'
 
 export default defineNuxtPlugin((nuxtApp) => {
   // v-opacity: 根据布尔值控制透明度
@@ -16,7 +16,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (position === 'static' || !position) el.style.position = 'relative'
 
       const root = document.createElement('div')
-      const app = createApp(LoadingOverlay)
+      const app = createApp(Loading)
       app.mount(root)
       el.__loadingRoot = root
       el.__loadingApp = app

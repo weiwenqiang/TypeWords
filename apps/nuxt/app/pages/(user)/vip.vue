@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import BasePage from '@/components/BasePage.vue'
-import BaseButton from '@/components/BaseButton.vue'
+import { BaseButton, BaseInput, BasePage, InputNumber, PopConfirm, Radio, RadioGroup, Toast } from '@typewords/base'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user.ts'
-import type { User } from '@/apis/user.ts'
+import { useUserStore } from '@typewords/core/stores/user.ts'
+import type { User } from '@typewords/core/apis/user.ts'
 import { onMounted, onUnmounted, watch } from 'vue'
-import Header from '@/components/Header.vue'
-import { alipayQuery, couponInfo, levelBenefits, orderCreate, orderStatus, setAutoRenewApi } from '@/apis/member.ts'
-import type { CouponInfo, LevelBenefits } from '@/apis/member.ts'
-import Radio from '@/components/base/radio/Radio.vue'
-import RadioGroup from '@/components/base/radio/RadioGroup.vue'
-import Toast from '@/components/base/toast/Toast.ts'
-import { _dateFormat, _nextTick } from '@/utils'
-import InputNumber from '@/components/base/InputNumber.vue'
-import BaseInput from '@/components/base/BaseInput.vue'
-import PopConfirm from '@/components/PopConfirm.vue'
+import Header from '@typewords/core/components/Header.vue'
+import type { CouponInfo, LevelBenefits } from '@typewords/core/apis/member.ts'
+import {
+  alipayQuery,
+  couponInfo,
+  levelBenefits,
+  orderCreate,
+  orderStatus,
+  setAutoRenewApi,
+} from '@typewords/core/apis/member.ts'
+import { _dateFormat, _nextTick } from '@typewords/core/utils'
 
 const router = useRouter()
 const userStore = useUserStore()

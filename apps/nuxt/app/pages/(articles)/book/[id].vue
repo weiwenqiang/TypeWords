@@ -1,26 +1,31 @@
 <script setup lang="ts">
-import BackIcon from '~/components/BackIcon.vue'
-import Empty from '~/components/Empty.vue'
-import ArticleList from '~/components/list/ArticleList.vue'
-import { useBaseStore } from '~/stores/base.ts'
-import type { Article, Dict } from '~/types/types.ts'
-import { useRuntimeStore } from '~/stores/runtime.ts'
-import BaseButton from '~/components/BaseButton.vue'
+import Empty from '@typewords/core/components/Empty.vue'
+import ArticleList from '@typewords/core/components/list/ArticleList.vue'
+import { useBaseStore } from '@typewords/core/stores/base.ts'
+import type { Article, Dict } from '@typewords/core/types/types.ts'
+import { useRuntimeStore } from '@typewords/core/stores/runtime.ts'
+import { BaseButton, BaseIcon, Switch, Toast, BackIcon } from '@typewords/base'
 import { useRoute, useRouter } from 'vue-router'
-import EditBook from '~/components/article/EditBook.vue'
+import EditBook from '@typewords/core/components/article/EditBook.vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
-import { _dateFormat, _getDictDataByUrl, _nextTick, msToHourMinute, resourceWrap, total, useNav } from '~/utils'
-import { getDefaultArticle, getDefaultDict } from '~/types/func.ts'
-import Toast from '~/components/base/toast/Toast.ts'
-import ArticleAudio from '~/components/article/ArticleAudio.vue'
-import { MessageBox } from '~/utils/MessageBox.tsx'
-import { useSettingStore } from '~/stores/setting.ts'
+import {
+  _dateFormat,
+  _getDictDataByUrl,
+  _nextTick,
+  msToHourMinute,
+  resourceWrap,
+  total,
+  useNav,
+} from '@typewords/core/utils'
+import { getDefaultArticle, getDefaultDict } from '@typewords/core/types/func.ts'
+import ArticleAudio from '@typewords/core/components/article/ArticleAudio.vue'
+import { MessageBox } from '@typewords/core/utils/MessageBox.tsx'
+import { useSettingStore } from '@typewords/core/stores/setting.ts'
 import { useFetch } from '@vueuse/core'
-import { DICT_LIST } from '~/config/env.ts'
-import BaseIcon from '~/components/BaseIcon.vue'
-import Switch from '~/components/base/Switch.vue'
-import { useGetDict } from '~/hooks/dict.ts'
-import { DictType } from '~/types/enum.ts'
+import { DICT_LIST } from '@typewords/core/config/env.ts'
+import { useGetDict } from '@typewords/core/hooks/dict.ts'
+import { DictType } from '@typewords/core/types/enum.ts'
+const { t } = useI18n()
 
 const runtimeStore = useRuntimeStore()
 const settingStore = useSettingStore()
@@ -116,7 +121,10 @@ function reset() {
         }
       }
       Toast.error('恢复失败')
-    }
+    },
+    null,
+    null,
+    { t }
   )
 }
 
@@ -238,8 +246,12 @@ watch(
             <BaseButton v-if="runtimeStore.editDict.custom && runtimeStore.editDict.url" type="info" @click="reset">
               {{ $t('restore_default') }}
             </BaseButton>
-            <BaseButton :loading="studyLoading || loading" type="info" @click="isEdit = true">{{ $t('edit') }}</BaseButton>
-            <BaseButton type="info" @click="router.push('/batch-edit-article')">{{ $t('article_management') }}</BaseButton>
+            <BaseButton :loading="studyLoading || loading" type="info" @click="isEdit = true">{{
+              $t('edit')
+            }}</BaseButton>
+            <BaseButton type="info" @click="router.push('/batch-edit-article')">{{
+              $t('article_management')
+            }}</BaseButton>
             <BaseButton :loading="studyLoading || loading" @click="startPractice">{{ $t('learn') }}</BaseButton>
           </div>
         </div>
@@ -394,7 +406,9 @@ watch(
                     <div class="line my-10"></div>
                     <div class="font-family text-base pr-2">
                       <div class="text-2xl font-bold">{{ $t('study_record') }}</div>
-                      <div class="mt-1 mb-3">{{ $t('total_study_time') }}：{{ msToHourMinute(total(currentPractice, 'spend')) }}</div>
+                      <div class="mt-1 mb-3">
+                        {{ $t('total_study_time') }}：{{ msToHourMinute(total(currentPractice, 'spend')) }}
+                      </div>
                       <div
                         class="item border border-item border-solid mt-2 p-2 bg-[var(--bg-history)] rounded-md flex justify-between"
                         v-for="i in currentPractice"

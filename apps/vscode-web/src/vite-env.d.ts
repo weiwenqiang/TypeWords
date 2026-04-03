@@ -18,6 +18,11 @@ declare module '*.wav' {
   export default src;
 }
 
+declare module '*.txt' {
+  const src: string;
+  export default src;
+}
+
 declare module "*.png";
 declare module "*.svg";
 declare module "*.jpeg";

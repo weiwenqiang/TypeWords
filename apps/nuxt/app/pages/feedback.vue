@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import BasePage from '@/components/BasePage.vue'
-import About from '@/components/About.vue'
-import { APP_NAME, Origin } from '~/config/env.ts'
+import { BasePage } from '@typewords/base'
+import About from '@typewords/core/components/About.vue'
+import { APP_NAME, Origin } from '@typewords/core/config/env.ts'
 
 let route = useRoute()
 let title = APP_NAME + ' 反馈'

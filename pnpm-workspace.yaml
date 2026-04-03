@@ -1,5 +1,3 @@
 packages:
-  #  - 'vscode'
-  #  - 'vscode-web'
   - apps/*
   - packages/*

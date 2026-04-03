@@ -1,7 +1,9 @@
 @use 'anim' as *;
 @use 'shepherd.css';
+@use "cursor.css";
+@use "vscode";
 
-:root {
+:root{
   --color-reverse-white: white;
   --color-reverse-black: black;
   --bg-history: white;
@@ -79,7 +81,7 @@ html.dark {
   --color-reverse-white: black;
   --color-reverse-black: white;
 
-  --color-primary: #202124;
+  --color-primary: rgb(25, 28, 34);
   --color-second: #292a2d;
   --color-third: #35373a;
   --color-fourth: rgb(70, 70, 70);
@@ -91,7 +93,6 @@ html.dark {
   --color-select-bg: rgb(147, 173, 227);
 
   --bg-history: rgb(43, 45, 48);
-  --color-item-border: rgb(41, 41, 41);
 
   --color-tooltip-bg: #35373a;
   --color-font-2: rgba(255, 255, 255, 0.5);
@@ -119,12 +120,22 @@ html.dark {
   --bg-book: #35373a;
 
   --color-line: rgb(66, 66, 66);
+
+  //--color-item-border:rgb(30, 33, 40);
+  --color-item-border: rgb(51, 56, 67);
+  --color-practice-font1: #7b88a1;
+  --color-practice-font2: #79869f;
+  --color-practice-font3: #414b5d;
+  --color-practice-font4: #404754;
+  --bg-bottom: #1e2128;
+  --bg-bottom2: #24282f;
+
+  --composer-pane-background:#191c22;
 }
 
 @media (max-width: 1720px) {
   :root {
     --toolbar-width: 50vw;
-    --panel-width: 20rem;
     --space: 0.5rem;
 
     --article-width: 60vw;
@@ -143,7 +154,6 @@ html.dark {
 
 @media (max-width: 1366px) {
   :root {
-    --panel-width: 20vw;
     --toolbar-width: 50vw;
     --stat-gap: 0.5rem;
     --space: 0.3rem;
@@ -167,7 +177,6 @@ html.dark {
 @media (max-width: 768px) {
   :root {
     --toolbar-width: 100vw;
-    --panel-width: 100vw;
     --article-width: 100vw;
     --article-toolbar-width: 100vw;
     --space: 0.5rem;
@@ -237,7 +246,7 @@ a {
   @apply hover:opacity-80;
 }
 
-.black-link{
+.black-link {
   @apply color-reverse-black hover:text-blue-600 transition duration-300 ease-in-out ;
 }
 

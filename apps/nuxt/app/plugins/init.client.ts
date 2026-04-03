@@ -1,11 +1,9 @@
 //@ts-ignore
 import VueVirtualScroller from 'vue-virtual-scroller'
-import { ENV } from '~/config/env.ts'
-import { useInit } from '~/composables/useInit.ts'
+import { ENV } from '@typewords/core/config/env.ts'
 
 export default defineNuxtPlugin(async nuxtApp => {
   if (
-    !location.href.includes('localhost') &&
     !location.href.includes('192.168') &&
     !location.href.includes('172.16') &&
     !location.href.includes('10.0')
@@ -23,31 +21,6 @@ export default defineNuxtPlugin(async nuxtApp => {
       document.head.appendChild(script)
     })()
 
-    // Cloudflare
-    ;(function () {
-      var cf = document.createElement('script')
-      cf.src = 'https://static.cloudflareinsights.com/beacon.min.js'
-      cf.setAttribute('data-cf-beacon', '{"token": "e5119992696d4155814400dd69781d68"}')
-      document.head.appendChild(cf)
-    })()
-
-    // google
-    ;(function () {
-      var ana = document.createElement('script')
-      ana.src = 'https://www.googletagmanager.com/gtag/js?id=G-50T6DRD837'
-      ana.onload = function () {
-        window.dataLayer = window.dataLayer || []
-        function gtag() {
-          window.dataLayer.push(arguments)
-        }
-        //@ts-ignore
-        gtag('js', new Date())
-        //@ts-ignore
-        gtag('config', 'G-50T6DRD837')
-      }
-      document.head.appendChild(ana)
-    })()
-
     // baidu
     var _hmt = _hmt || []
     ;(function () {
@@ -56,13 +29,23 @@ export default defineNuxtPlugin(async nuxtApp => {
       document.head.appendChild(hm)
     })()
 
-    // umami-saas
+    // umami
     ;(function () {
       var umami2 = document.createElement('script')
-      umami2.src = ENV.RESOURCE_URL + 'libs/my-um.js'
-      umami2.setAttribute('data-website-id', '03102800-e8e8-40a2-addf-9999d5e5c525')
+      umami2.src = ENV.RESOURCE_URL + 'libs/s.js'
+      umami2.setAttribute('data-website-id', '160308c9-7900-4b1d-a0b1-c3b25a9530f6')
       document.head.appendChild(umami2)
     })()
+
+    // umami-saas
+    // ;(function () {
+    //   var umami2 = document.createElement('script')
+    //   // umami2.src = ENV.RESOURCE_URL + 'libs/my-um.js'
+    //   // umami2.setAttribute('data-website-id', '03102800-e8e8-40a2-addf-9999d5e5c525')
+    //   umami2.src = 'https://stat.typewords.cc/script.js'
+    //   umami2.setAttribute('data-website-id', 'e725f66a-1f63-4c53-a96b-ba073edecac8')
+    //   document.head.appendChild(umami2)
+    // })()
   }
 
   if ('serviceWorker' in navigator) {
@@ -103,9 +86,6 @@ export default defineNuxtPlugin(async nuxtApp => {
   console.parse = function (v: any) {
     console.log(JSON.parse(v))
   }
-
-  const init = useInit()
-  init()
 
   nuxtApp.vueApp.use(VueVirtualScroller)
 })

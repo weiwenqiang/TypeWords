@@ -1,28 +1,31 @@
 <script setup lang="ts">
-import { myDictList } from '@/apis'
-import Progress from '@/components/base/Progress.vue'
-import Toast from '@/components/base/toast/Toast.ts'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseIcon from '@/components/BaseIcon.vue'
-import BasePage from '@/components/BasePage.vue'
-import Book from '@/components/Book.vue'
-import DeleteIcon from '@/components/icon/DeleteIcon.vue'
-import PopConfirm from '@/components/PopConfirm.vue'
-import { APP_NAME, AppEnv, DICT_LIST, Host, LIB_JS_URL, TourConfig } from '@/config/env.ts'
-import { useBaseStore } from '@/stores/base.ts'
-import { useRuntimeStore } from '@/stores/runtime.ts'
-import { useSettingStore } from '@/stores/setting.ts'
-import { getDefaultDict } from '@/types/func.ts'
-import type { DictResource } from '@/types/types.ts'
-import { _getDictDataByUrl, _nextTick, isMobile, loadJsLib, msToHourMinute, resourceWrap, total, useNav } from '@/utils'
-import { getPracticeArticleCache } from '@/utils/cache.ts'
+import { myDictList } from '@typewords/core/apis'
+import { BaseButton, BaseIcon, BasePage, DeleteIcon, PopConfirm, Progress, Toast } from '@typewords/base'
+import Book from '@typewords/core/components/Book.vue'
+import { APP_NAME, AppEnv, DICT_LIST, LIB_JS_URL, Old_Host, Origin, TourConfig } from '@typewords/core/config/env.ts'
+import { useBaseStore } from '@typewords/core/stores/base.ts'
+import { useRuntimeStore } from '@typewords/core/stores/runtime.ts'
+import { useSettingStore } from '@typewords/core/stores/setting.ts'
+import { getDefaultDict } from '@typewords/core/types/func.ts'
+import type { DictResource } from '@typewords/core/types/types.ts'
+import {
+  _getDictDataByUrl,
+  _nextTick,
+  isMobile,
+  loadJsLib,
+  msToHourMinute,
+  resourceWrap,
+  total,
+  useNav,
+} from '@typewords/core/utils'
 import { useFetch } from '@vueuse/core'
 import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { DictType } from '@/types/enum.ts'
+import { DictType } from '@typewords/core/types/enum.ts'
+import { usePracticeArticlePersistence } from '@typewords/core/composables/usePracticePersistence.ts'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isBetween)
@@ -38,16 +41,36 @@ const settingStore = useSettingStore()
 const router = useRouter()
 const runtimeStore = useRuntimeStore()
 let isSaveData = $ref(false)
+const articlePersistence = usePracticeArticlePersistence()
 
 watch(
-  () => store.load,
-  n => {
-    if (n) init()
+  [() => store.load, () => runtimeStore.globalLoading],
+  ([a, b]) => {
+    if (a && !b) {
+      init()
+    }
   },
   { immediate: true }
 )
 
+async function onvisibilitychange() {
+  if (!document.hidden) {
+    //当页面可见时，检查是否需要从远程拉取数据
+    const d = await articlePersistence.load()
+    if (d) {
+      isSaveData = true
+    }
+  }
+}
+
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', onvisibilitychange)
+})
+
 async function init() {
+  document.removeEventListener('visibilitychange', onvisibilitychange)
+  document.addEventListener('visibilitychange', onvisibilitychange)
+
   if (AppEnv.CAN_REQUEST) {
     let res = await myDictList({ type: 'article' })
     if (res.success) {
@@ -59,7 +82,7 @@ async function init() {
       store.article.bookList[store.article.studyIndex] = await _getDictDataByUrl(store.sbook, DictType.article)
     }
   }
-  let d = getPracticeArticleCache()
+  const d = await articlePersistence.load()
   if (d) {
     isSaveData = true
   }
@@ -210,18 +233,18 @@ const weekList = $computed(() => {
 
 const { data: recommendBookList, isFetching } = useFetch(resourceWrap(DICT_LIST.ARTICLE.RECOMMENDED)).json()
 
-let isNewHost = $ref(true)
+let isOldHost = $ref(false)
 onMounted(() => {
-  isNewHost = window.location.host === Host
+  isOldHost = window.location.host === Old_Host
 })
 </script>
 
 <template>
   <BasePage>
-    <div class="mb-4" v-if="!isNewHost">
-      新域名已启用，后续请访问
-      <a href="https://typewords.cc/words?from_old_site=1">https://typewords.cc</a> 当前 2study.top
-      域名将在不久后停止使用
+    <div class="my-30 text-2xl text-red" v-if="isOldHost">
+      已启用新域名
+      <a class="mr-4" :href="`${Origin}/words?from_old_site=1`">{{ Origin }}</a
+      >当前 2study.top 域名将在不久后停止使用
     </div>
 
     <div class="card flex flex-col md:flex-row justify-between gap-space p-4 md:p-6">
@@ -316,7 +339,9 @@ onMounted(() => {
           >
             {{ isMultiple ? $t('cancel') : $t('manage_books') }}
           </div>
-          <div class="color-link cursor-pointer" @click="nav('/book', { isAdd: true })">{{ $t('create_personal_book') }}</div>
+          <div class="color-link cursor-pointer" @click="nav('/book', { isAdd: true })">
+            {{ $t('create_personal_book') }}
+          </div>
         </div>
       </div>
       <div class="flex gap-4 flex-wrap mt-4">

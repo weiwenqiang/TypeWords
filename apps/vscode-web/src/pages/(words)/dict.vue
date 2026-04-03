@@ -1,36 +1,37 @@
 <script setup lang="tsx">
-import { detail } from '@/apis'
-import BackIcon from '@/components/BackIcon.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseIcon from '@/components/BaseIcon.vue'
-import BasePage from '@/components/BasePage.vue'
-import BaseTable from '@/components/BaseTable.vue'
-import PopConfirm from '@/components/PopConfirm.vue'
-import WordItem from '@/components/WordItem.vue'
-import BaseInput from '@/components/base/BaseInput.vue'
-import Textarea from '@/components/base/Textarea.vue'
-import Form from '@/components/base/form/Form.vue'
-import FormItem from '@/components/base/form/FormItem.vue'
-import Toast from '@/components/base/toast/Toast.ts'
-import DeleteIcon from '@/components/icon/DeleteIcon.vue'
-import { AppEnv, DictId, LIB_JS_URL, TourConfig } from '@/config/env.ts'
-import { getCurrentStudyWord } from '@/hooks/dict.ts'
-import EditBook from '~/components/article/EditBook.vue'
-import PracticeSettingDialog from '~/components/word/PracticeSettingDialog.vue'
-import { useBaseStore } from '@/stores/base.ts'
-import { useRuntimeStore } from '@/stores/runtime.ts'
-import { useSettingStore } from '@/stores/setting.ts'
-import { getDefaultDict } from '@/types/func.ts'
-import { _getDictDataByUrl, _nextTick, convertToWord, isMobile, loadJsLib, reverse, shuffle, useNav } from '@/utils'
-import { MessageBox } from '@/utils/MessageBox.tsx'
+import { detail } from '@typewords/core/apis'
+import { BaseButton, BaseIcon, BasePage, Form, FormItem, PopConfirm, Textarea, Toast, BackIcon } from '@typewords/base'
+import BaseTable from '@typewords/core/components/BaseTable.vue'
+import WordItem from '@typewords/core/components/word/WordItem.vue'
+import { BaseInput } from '@typewords/base'
+import { DeleteIcon } from '@typewords/base'
+import { AppEnv, DictId, LIB_JS_URL, TourConfig } from '@typewords/core/config/env.ts'
+import { getCurrentStudyWord } from '@typewords/core/hooks/dict.ts'
+import EditBook from '@typewords/core/components/article/EditBook.vue'
+import PracticeSettingDialog from '@typewords/core/components/word/PracticeSettingDialog.vue'
+import { useBaseStore } from '@typewords/core/stores/base.ts'
+import { useRuntimeStore } from '@typewords/core/stores/runtime.ts'
+import { useSettingStore } from '@typewords/core/stores/setting.ts'
+import { getDefaultDict } from '@typewords/core/types/func.ts'
+import {
+  _getDictDataByUrl,
+  _nextTick,
+  convertToWord,
+  isMobile,
+  loadJsLib,
+  reverse,
+  shuffle,
+  useNav,
+} from '@typewords/core/utils'
+import { MessageBox } from '@typewords/core/utils/MessageBox.tsx'
 import { nanoid } from 'nanoid'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { wordDelete } from '@/apis/words.ts'
-import { copyOfficialDict } from '@/apis/dict.ts'
-import { PRACTICE_WORD_CACHE } from '@/utils/cache.ts'
-import { Sort } from '@/types/enum.ts'
+import { wordDelete } from '@typewords/core/apis/words.ts'
+import { copyOfficialDict } from '@typewords/core/apis/dict.ts'
+import { PRACTICE_WORD_CACHE } from '@typewords/core/utils/cache.ts'
+import { Sort, WordPracticeMode } from '@typewords/core/types/enum.ts'
 
 const runtimeStore = useRuntimeStore()
 const base = useBaseStore()
@@ -185,11 +186,11 @@ function word2Str(word) {
   res.synos = word.synos.map(v => (v.pos + v.cn + '\n' + v.ws.join('/')).replaceAll('"', '')).join('\n\n')
   res.relWords = word.relWords.root
     ? '词根:' +
-    word.relWords.root +
-    '\n\n' +
-    word.relWords.rels
-      .map(v => (v.pos + '\n' + v.words.map(v => v.c + ':' + v.cn).join('\n')).replaceAll('"', ''))
-      .join('\n\n')
+      word.relWords.root +
+      '\n\n' +
+      word.relWords.rels
+        .map(v => (v.pos + '\n' + v.words.map(v => v.c + ':' + v.cn).join('\n')).replaceAll('"', ''))
+        .join('\n\n')
     : ''
   res.etymology = word.etymology.map(v => (v.t + '\n' + v.d).replaceAll('"', '')).join('\n\n')
   return res
@@ -275,7 +276,11 @@ const { nav } = useNav()
 
 //todo 可以和首页合并
 async function startPractice(query = {}) {
-  console.log(1)
+  //这里重置一下，因为下面切换词典后，导致学习进度为0，而切换前的模式有可能需要有进度才可以用
+  if (![WordPracticeMode.Free, WordPracticeMode.System].includes(settingStore.wordPracticeMode)) {
+    settingStore.wordPracticeMode = WordPracticeMode.System
+  }
+  // console.log(1)
   localStorage.removeItem(PRACTICE_WORD_CACHE.key)
   studyLoading = true
   await base.changeDict(runtimeStore.editDict)
@@ -296,18 +301,18 @@ async function addMyStudyList() {
   if (!runtimeStore.editDict.words.length) {
     return Toast.warning('没有单词可学习！')
   }
-  if (!settingStore.disableShowPracticeSettingDialog) {
-    showPracticeSettingDialog = true
-    return
-  }
-  startPractice()
+  showPracticeSettingDialog = true
 }
 
 async function startTest() {
   loading = true
+  //这里重置一下，因为下面切换词典后，导致学习进度为0，而切换前的模式有可能需要有进度才可以用
+  if (![WordPracticeMode.Free, WordPracticeMode.System].includes(settingStore.wordPracticeMode)) {
+    settingStore.wordPracticeMode = WordPracticeMode.System
+  }
   await base.changeDict(runtimeStore.editDict)
   loading = false
-  nav('words-test/' + store.sdict.id)
+  nav('words-test/' + store.sdict.id, {}, {})
 }
 
 let exportLoading = $ref(false)
@@ -595,7 +600,8 @@ defineRender(() => {
                 {$t('word_list')}
               </div>
               <div class={`tab-item ${activeTab === 'edit' ? 'active' : ''}`} onClick={() => (activeTab = 'edit')}>
-                {wordForm.id ? $t('edit') : $t('add')}{$t('word')}
+                {wordForm.id ? $t('edit') : $t('add')}
+                {$t('word')}
               </div>
             </div>
           )}
@@ -644,7 +650,10 @@ defineRender(() => {
             </div>
             {isOperate ? (
               <div class={`edit-section flex-1 flex flex-col ${isMob && activeTab !== 'edit' ? 'mobile-hidden' : ''}`}>
-                <div class="common-title">{wordForm.id ? $t('edit') : $t('add')}{$t('word')}</div>
+                <div class="common-title">
+                  {wordForm.id ? $t('edit') : $t('add')}
+                  {$t('word')}
+                </div>
                 <Form
                   class="flex-1 overflow-auto pr-2"
                   ref={e => (wordFormRef = e)}

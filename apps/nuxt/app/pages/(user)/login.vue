@@ -1,25 +1,20 @@
 <script setup lang="tsx">
 import { onBeforeUnmount, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import BaseInput from '@/components/base/BaseInput.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import { APP_NAME } from '@/config/env.ts'
-import { useUserStore } from '@/stores/user.ts'
-import { loginApi, LoginParams, registerApi, resetPasswordApi } from '@/apis/user.ts'
-import { accountRules, codeRules, passwordRules, phoneRules } from '@/utils/validation.ts'
-import Toast from '@/components/base/toast/Toast.ts'
-import FormItem from '@/components/base/form/FormItem.vue'
-import Form from '@/components/base/form/Form.vue'
-import Notice from '@/components/user/Notice.vue'
-import { FormInstance } from '@/components/base/form/types.ts'
-import { PASSWORD_CONFIG, PHONE_CONFIG } from '@/config/auth.ts'
-import Code from '@/components/user/Code.vue'
-import { jump2Feedback, sleep, useNav } from '@/utils'
-import Header from '@/components/Header.vue'
-import PopConfirm from '@/components/PopConfirm.vue'
-import { useExport } from '@/hooks/export.ts'
-import { getProgress, uploadImportData } from '@/apis'
-import { CodeType, ImportStatus } from '@/types/enum.ts'
+import { BaseInput } from '@typewords/base'
+import { BaseButton, PopConfirm, FormItem, Form, type FormInstance, Toast } from '@typewords/base'
+import { APP_NAME } from '@typewords/core/config/env.ts'
+import { useUserStore } from '@typewords/core/stores/user.ts'
+import { loginApi, type LoginParams, registerApi, resetPasswordApi } from '@typewords/core/apis/user.ts'
+import { accountRules, codeRules, passwordRules, phoneRules } from '@typewords/core/utils/validation.ts'
+import Notice from '@typewords/core/components/user/Notice.vue'
+import { PASSWORD_CONFIG, PHONE_CONFIG } from '@typewords/core/config/auth.ts'
+import Code from '@typewords/core/components/user/Code.vue'
+import { jump2Feedback, sleep, useNav } from '@typewords/core/utils'
+import Header from '@typewords/core/components/Header.vue'
+import { useExport } from '@typewords/core/hooks/export.ts'
+import { getProgress, uploadImportData } from '@typewords/core/apis'
+import { CodeType, ImportStatus } from '@typewords/core/types/enum.ts'
 
 // 状态管理
 const userStore = useUserStore()
@@ -458,7 +453,9 @@ function goHome() {}
               <span v-if="loginType === 'code'">，{{ $t('auto_register_notice') }}</span>
             </Notice>
 
-            <BaseButton class="w-full" size="large" :loading="loading" @click="handleLogin"> {{ $t('login') }} </BaseButton>
+            <BaseButton class="w-full" size="large" :loading="loading" @click="handleLogin">
+              {{ $t('login') }}
+            </BaseButton>
 
             <!-- 底部操作链接 - 只在密码登录时显示 -->
             <div class="mt-4 flex justify-between text-sm" v-opacity="loginType !== 'code'">
@@ -522,7 +519,9 @@ function goHome() {}
 
             <Notice />
 
-            <BaseButton class="w-full" size="large" :loading="loading" @click="handleRegister"> {{ $t('register') }} </BaseButton>
+            <BaseButton class="w-full" size="large" :loading="loading" @click="handleRegister">
+              {{ $t('register') }}
+            </BaseButton>
           </div>
 
           <!-- 忘记密码模式 -->
@@ -611,7 +610,8 @@ function goHome() {}
               <IconFluentErrorCircle20Regular class="color-red text-4xl" />
               <div class="text-base text-gray-700 font-medium">{{ $t('login_cancelled') }}</div>
               <div class="text-xs text-gray-600">
-                你可<span class="color-link" @click="refreshQRCode">{{ $t('login_again') }}</span>，或关闭窗口
+                你可<span class="color-link" @click="refreshQRCode">{{ $t('login_again') }}</span
+                >，或关闭窗口
               </div>
             </div>
             <!-- 过期蒙层 -->
@@ -696,4 +696,3 @@ function goHome() {}
     </div>
   </div>
 </template>
-

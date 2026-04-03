@@ -1,25 +1,20 @@
 <script setup lang="ts">
-import type { Article } from '@/types/types.ts'
-import BaseButton from '@/components/BaseButton.vue'
-import { cloneDeep, loadJsLib } from '@/utils'
+import type { Article } from '@typewords/core/types/types.ts'
+import { BaseButton, Toast, MiniDialog, UploadButton ,BackIcon} from '@typewords/base'
+import { cloneDeep, loadJsLib } from '@typewords/core/utils'
 
-import List from '@/components/list/List.vue'
-import { useWindowClick } from '@/hooks/event.ts'
-import { MessageBox } from '@/utils/MessageBox.tsx'
-import { useRuntimeStore } from '@/stores/runtime.ts'
+import List from '@typewords/core/components/list/List.vue'
+import { useWindowClick } from '@typewords/core/hooks/event.ts'
+import { MessageBox } from '@typewords/core/utils/MessageBox.tsx'
+import { useRuntimeStore } from '@typewords/core/stores/runtime.ts'
 import { nanoid } from 'nanoid'
-import EditArticle from '@/components/article/EditArticle.vue'
-import Toast from '@/components/base/toast/Toast.ts'
-import { getDefaultArticle } from '@/types/func.ts'
-import BackIcon from '@/components/BackIcon.vue'
-import MiniDialog from '@/components/dialog/MiniDialog.vue'
+import EditArticle from '@typewords/core/components/article/EditArticle.vue'
+import { getDefaultArticle } from '@typewords/core/types/func.ts'
 import { onMounted } from 'vue'
-import { LIB_JS_URL } from '@/config/env.ts'
-import { syncBookInMyStudyList } from '@/hooks/article.ts'
-
-definePageMeta({
-  layout: 'empty',
-})
+import { LIB_JS_URL } from '@typewords/core/config/env.ts'
+import { syncBookInMyStudyList } from '@typewords/core/hooks/article.ts'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const runtimeStore = useRuntimeStore()
 
@@ -50,6 +45,7 @@ function checkDataChange() {
         editArticle.text !== article.text ||
         editArticle.textTranslate !== article.textTranslate
       ) {
+
         return MessageBox.confirm(
           '检测到数据有变动，是否保存？',
           '提示',
@@ -57,7 +53,9 @@ function checkDataChange() {
             let r = await editArticleRef.save('save')
             if (r) resolve(true)
           },
-          () => resolve(true)
+          () => resolve(true),
+          null,
+          {t}
         )
       }
     } else {
@@ -69,7 +67,9 @@ function checkDataChange() {
             let r = await editArticleRef.save('save')
             if (r) resolve(true)
           },
-          () => resolve(true)
+          () => resolve(true),
+          null,
+          {t}
         )
       }
     }
@@ -185,7 +185,8 @@ function importData(e: any) {
             importLoading = false
             syncBookInMyStudyList()
             Toast.success('导入成功！')
-          }
+          },
+          {t}
         )
       } else {
         syncBookInMyStudyList()
@@ -267,14 +268,13 @@ function updateList(e) {
       </List>
       <div class="add" v-if="!article.title">正在添加新文章...</div>
       <div class="footer">
-        <div class="import">
-          <BaseButton :loading="importLoading">导入</BaseButton>
-          <input
-            type="file"
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            @change="importData"
-          />
-        </div>
+        <UploadButton
+          @change="importData"
+          :loading="importLoading"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+        >
+          导入
+        </UploadButton>
         <div class="export" style="position: relative" @click.stop="null">
           <BaseButton @click="showExport = true">导出</BaseButton>
           <MiniDialog v-model="showExport" style="width: 8rem; bottom: calc(100% + 1rem); top: unset">

@@ -37,9 +37,6 @@
     //For TS to resolve aliases, they should be added in tsconfig.json under compilerOptions.paths:
     // https://betterprogramming.pub/the-right-usage-of-aliases-in-webpack-typescript-4418327f47fa
     "paths": {
-      "@ui/*": [
-        "../../../packages/ui/src/*"
-      ],
       "@/*": [
         "*"
       ]

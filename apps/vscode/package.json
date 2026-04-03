@@ -2,10 +2,13 @@
   "name": "typewords",
   "displayName": "TypeWords",
   "description": "TypeWords Vscode Extension",
-  "version": "0.0.1",
+  "repository":"https://github.com/zyronon/TypeWords",
+  "publisher":"TypeWords",
+  "version": "0.0.8",
   "engines": {
-    "vscode": "^1.107.1"
+    "vscode": "^1.105.0"
   },
+  "icon": "logo.png",
   "categories": [
     "Other"
   ],
@@ -14,12 +17,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "typewords.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "typewords.openChat",
-        "title": "打开单词练习聊天",
+        "title": "打开TypeWords",
         "icon": "$(comment-discussion)"
       }
     ]
@@ -33,7 +32,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.108.1",
+    "@types/vscode": "^1.105.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "typescript-eslint": "^8.52.0",

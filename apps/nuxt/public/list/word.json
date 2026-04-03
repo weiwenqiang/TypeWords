@@ -325,19 +325,6 @@
       "translateLanguage": "zh-CN"
     },
     {
-      "id": "4000_Essential_English_Words2",
-      "name": "Essential Words",
-      "description": "4000 Essential English Words sentence",
-      "category": "中国考试",
-      "tags": [
-        "其他"
-      ],
-      "url": "4000_Essential_English_Words-sentence.json",
-      "length": 3600,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
       "id": "longman_communication_3000_words",
       "name": "Longman Communication 3000",
       "description": "Most frequent words in both spoken and written English",
@@ -442,32 +429,6 @@
       "translateLanguage": "zh-CN"
     },
     {
-      "id": "suffix word",
-      "name": "suffix word",
-      "description": "common suffix",
-      "category": "中国考试",
-      "tags": [
-        "其他"
-      ],
-      "url": "suffix_word.json",
-      "length": 126,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
-      "id": "word roots1",
-      "name": "word roots1",
-      "description": "common roots",
-      "category": "中国考试",
-      "tags": [
-        "其他"
-      ],
-      "url": "word_roots1.json",
-      "length": 369,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
       "id": "adult self-study examination",
       "name": "专升本词汇",
       "description": "专升本词汇",
@@ -547,8 +508,8 @@
     },
     {
       "id": "TOEFL_ZhangHongYan",
-      "name": "ZhangHongYan的TOEFL词汇书",
-      "description": "ZhangHongYan的TOEFL词汇书-词以类记",
+      "name": "张红岩的TOEFL词汇书",
+      "description": "张红岩的TOEFL词汇书-词以类记",
       "category": "国际考试",
       "tags": [
         "TOEFL"
@@ -808,19 +769,6 @@
       "translateLanguage": "zh-CN"
     },
     {
-      "id": "ielts_order",
-      "name": "IELTS顺序完整版",
-      "description": "IELTS顺序完整版",
-      "category": "国际考试",
-      "tags": [
-        "IELTS"
-      ],
-      "url": "IELTS_order.json",
-      "length": 9389,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
       "id": "ielts",
       "name": "IELTS",
       "description": "雅思词库",
@@ -1017,8 +965,8 @@
     },
     {
       "id": "IELTSKingLu807",
-      "name": "wanglu807雅思词汇听力第2版",
-      "description": "wanglu807雅思词汇听力第2版",
+      "name": "王陆807雅思词汇听力第2版",
+      "description": "王陆807雅思词汇听力第2版",
       "category": "国际考试",
       "tags": [
         "IELTS"
@@ -1038,19 +986,6 @@
       ],
       "url": "IELTS_XDF_7000.json",
       "length": 5567,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
-      "id": "IELTS-oral-900",
-      "name": "雅思口语 900 beta版",
-      "description": "雅思口语 900 句, 需在 qwerty 设置中调小英语字体",
-      "category": "国际考试",
-      "tags": [
-        "IELTS"
-      ],
-      "url": "IELTS-oral-900.json",
-      "length": 900,
       "language": "en",
       "translateLanguage": "zh-CN"
     },
@@ -1562,19 +1497,6 @@
       "translateLanguage": "zh-CN"
     },
     {
-      "id": "SATen",
-      "name": "SAT en-en",
-      "description": "SAT英英",
-      "category": "国际考试",
-      "tags": [
-        "SAT"
-      ],
-      "url": "SATen.json",
-      "length": 2681,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
       "id": "toefl",
       "name": "TOEFL",
       "description": "托福考试常见词",
@@ -1834,34 +1756,6 @@
       "language": "en",
       "translateLanguage": "zh-CN"
     },
-    {
-      "id": "Common-Phrases-PTE-Unofficial",
-      "name": "PTE 常用短语 (非官方)",
-      "description": "PTE 常用短语",
-      "category": "国际考试",
-      "tags": [
-        "PTE"
-      ],
-      "url": "Common-Phrases-PTE-Unofficial.json",
-      "length": 274,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-    {
-      "id": "Common-Phrases-FCE-Unofficial",
-      "name": "FCE 常用短语 (非官方)",
-      "description": "FCE 常用短语",
-      "category": "国际考试",
-      "tags": [
-        "FCE"
-      ],
-      "url": "Common-Phrases-FCE-Unofficial.json",
-      "length": 438,
-      "language": "en",
-      "translateLanguage": "zh-CN"
-    },
-
-
     {
       "id": "gaokao3500",
       "name": "高考 3500 词",

@@ -237,7 +237,7 @@ a {
   @apply hover:opacity-80;
 }
 
-.black-link{
+.black-link {
   @apply color-reverse-black hover:text-blue-600 transition duration-300 ease-in-out ;
 }
 
@@ -297,8 +297,12 @@ a {
     @apply opacity-0;
   }
 
+  &.disabled {
+    @apply opacity-50;
+  }
+
   &.active {
-    @apply bg-fifth;
+    @apply bg-fifth opacity-100;
 
     .item-sub-title {
       color: var(--color-sub-text);
@@ -348,7 +352,7 @@ a {
 
 .word-shadow {
   color: transparent !important;
-  text-shadow: #b0b0b0 0 0 0.5rem;
+  text-shadow: #b0b0b0 0 0 0.8rem;
   user-select: none;
 }
 

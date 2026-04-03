@@ -1,94 +1,118 @@
-<script setup lang="ts">
-import { resourceWrap, useNav } from "@/utils";
-import BasePage from "@/components/BasePage.vue";
-import type { DictResource } from "@/types/types";
-import { useRuntimeStore } from "@/stores/runtime";
-import BaseIcon from "@/components/BaseIcon.vue";
-import Empty from "@/components/Empty.vue";
-import BaseButton from "@/components/BaseButton.vue";
-import DictList from "@/components/list/DictList.vue";
-import BackIcon from "@/components/BackIcon.vue";
-import { useRouter } from "vue-router";
-import { computed } from "vue";
-import { getDefaultDict } from "@/types/func";
-import BaseInput from "@/components/base/BaseInput.vue";
+<script setup lang="tsx">
+import { BaseIcon, BasePage, PopConfirm } from '@typewords/base'
+import { ref } from 'vue'
+import axios from 'axios'
+import {DeleteIcon} from '@typewords/base'
+import BaseTable from '@typewords/core/components/BaseTable.vue'
+import WordItem from '@typewords/core/components/word/WordItem.vue'
 
-const {nav} = useNav()
-const runtimeStore = useRuntimeStore()
-const router = useRouter()
+let list = $ref([])
+let selectedFile = $ref(null)
+let fileContent = $ref([])
+let loading = $ref(false)
+let showPanel = $ref(false)
+let tableRef = ref()
 
-function selectDict(e) {
-  console.log(e.dict)
-  getDictDetail(e.dict)
-}
-
-async function getDictDetail(val: DictResource) {
-  runtimeStore.editDict = getDefaultDict(val)
-  nav('/book', {from: 'list'})
-}
-
-let showSearchInput = $ref(false)
-let searchKey = $ref('')
-// const {data: bookList, isFetching} = useFetch(resourceWrap(DICT_LIST.ARTICLE.ALL)).json()
-// const {data: bookList,} = useFetch(resourceWrap(DICT_LIST.ARTICLE.ALL))
-
-// SSR 阶段获取数据
-const {data: bookList} =await useFetch('/api/articles')
-
-const searchList = computed<any[]>(() => {
-  if (searchKey) {
-    let s = searchKey.toLowerCase()
-    return bookList.value.filter((item) => {
-      return item.id.toLowerCase().includes(s)
-          || item.name.toLowerCase().includes(s)
-          || item.category.toLowerCase().includes(s)
-          || item.tags.join('').replace('所有', '').toLowerCase().includes(s)
-          || item?.url?.toLowerCase?.().includes?.(s)
-    })
+const handleFileClick = async item => {
+  selectedFile = item
+  showPanel = true
+  loading = true
+  try {
+    const response = await axios.get('http://jl.cc/' + item.url)
+    fileContent = response.data
+    tableRef.value.getData()
+  } catch (error) {
+    fileContent = '加载失败: ' + error.message
+  } finally {
+    loading = false
   }
-  return []
+}
+
+const closePanel = () => {
+  showPanel = false
+}
+
+onMounted(() => {
+  axios.get('http://jl.cc/').then(response => {
+    const regex = /<a href="([^"]+)">([^<]+)<\/a>/g
+    let match
+    while ((match = regex.exec(response.data)) !== null) {
+      // match[1] 是文件链接，match[2] 是文件名
+      list.push({ url: match[1], filename: match[2] })
+    }
+  })
 })
 
+async function requestList({ pageNo, pageSize, searchKey }) {
+  return { pageNo, pageSize, searchKey, list: fileContent, total: fileContent.length }
+}
+
+defineRender(() => {
+  return (
+    <BasePage class="h-screen">
+      <div class="card h-9/10 ">
+        <div class="flex  overflow-hidden">
+          <div class="left shrink-0 overflow-auto">
+            {list.map(item => {
+              return (
+                <div
+                  key={item.filename}
+                  class="file-item cursor-pointer hover:bg-gray-100 p-2"
+                  onClick={() => handleFileClick(item)}
+                >
+                  {item.filename}
+                </div>
+              )
+            })}
+          </div>
+
+          <div class="right">
+            <div v-if="showPanel" class="panel  ">
+              <div class="panel-header flex justify-between items-center py-3 px-4 border-b">
+                <span class="font-bold">{selectedFile?.filename}</span>
+                <button click="closePanel" class="close-btn">
+                  &times;
+                </button>
+              </div>
+              <div class="panel-content  ">
+                <BaseTable ref={tableRef} class="h-full w-100" request={requestList}>
+                  {val => (
+                    <WordItem
+                      showTransPop={false}
+                      onClick={() => editWord(val.item)}
+                      index={val.index}
+                      showCollectIcon={false}
+                      showMarkIcon={false}
+                      item={val.item}
+                    >
+                      {{
+                        prefix: () => val.checkbox(val.item),
+                        suffix: () => (
+                          <div class="flex flex-col">
+                            <BaseIcon class="option-icon" onClick={() => editWord(val.item)} title="编辑">
+                              <IconFluentTextEditStyle20Regular />
+                            </BaseIcon>
+                            <PopConfirm title="确认删除？" onConfirm={() => batchDel([val.item.id])}>
+                              <BaseIcon class="option-icon" title="删除">
+                                <DeleteIcon />
+                              </BaseIcon>
+                            </PopConfirm>
+                          </div>
+                        ),
+                      }}
+                    </WordItem>
+                  )}
+                </BaseTable>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BasePage>
+  )
+})
 </script>
 
-<template>
-  <BasePage>
-    <div class="card min-h-50">
-      <div class="flex items-center relative gap-2">
-        <BackIcon class="z-2" @Click='router.back'/>
-        <div class="flex flex-1 gap-4" v-if="showSearchInput">
-          <BaseInput prefix-icon placeholder="请输入书籍名称/缩写/类别" v-model="searchKey" class="flex-1" autofocus
-                     clearable/>
-          <BaseButton @click="showSearchInput = false, searchKey = ''">取消</BaseButton>
-        </div>
-        <div class="py-1 flex flex-1 justify-end" v-else>
-          <span class="page-title absolute w-full center">书籍列表</span>
-          <BaseIcon @click="showSearchInput = true"
-                    class="z-1">
-            <IconFluentSearch24Regular/>
-          </BaseIcon>
-        </div>
-      </div>
-      <div class="mt-4" v-if="searchKey">
-        <DictList
-          v-if="searchList.length "
-          @selectDict="selectDict"
-          :list="searchList"
-          quantifier="篇"
-          :select-id="'-1'"/>
-        <Empty v-else text="没有相关书籍"/>
-      </div>
-      <div class="w-full mt-2" v-else>
-        <DictList
-          v-if="bookList?.length "
-          @selectDict="selectDict"
-          :list="bookList"
-          quantifier="篇"
-          :select-id="'-1'"/>
-      </div>
-    </div>
-  </BasePage>
-</template>
+<template></template>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

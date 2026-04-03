@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { APP_NAME, GITHUB } from '~/config/env.ts'
-import BaseIcon from '~/components/BaseIcon.vue'
-import { getSystemTheme, listenToSystemThemeChange, setTheme, swapTheme } from '~/hooks/theme.ts'
+import { APP_NAME, GITHUB } from '@typewords/core/config/env.ts'
+import { BaseIcon } from '@typewords/base'
+import { getSystemTheme, listenToSystemThemeChange, setTheme, swapTheme } from '@typewords/core/hooks/theme.ts'
+import ChannelIcons from '@typewords/core/components/channel-icons/ChannelIcons.vue'
 
 definePageMeta({
   layout: 'empty',
 })
-
-function nav(url: string) {
-  window.location.href = url
-}
 
 let theme = $ref('light')
 
@@ -106,33 +103,37 @@ const { locales, setLocale, locale } = useI18n()
       <h1>{{ APP_NAME }}</h1>
       <h2 class="font-normal m-0">{{ $t('app_desc') }}</h2>
       <div class="">
-        <div class="base-button" @click="nav('/words')">{{ $t('start_word_practice') }}</div>
-        <div class="base-button" @click="nav('/articles')">{{ $t('start_article_practice') }}</div>
+        <div class="base-button" @click="navigateTo('/words')">{{ $t('start_word_practice') }}</div>
+        <div class="base-button" @click="navigateTo('/articles')">{{ $t('start_article_practice') }}</div>
       </div>
 
       <div class="w-70vw mb-4 mt-20">
-        <div class="text-4xl font-bold mb-8">{{ $t('home_word_practice') }}</div>
         <div class="flex gap-10">
-          <ul class="p-0 m-0 list-none space-y-2 max-w-80">
-            <li>{{ $t('home_word_practice_desc1') }}</li>
-            <li>{{ $t('home_word_practice_desc2') }}</li>
-            <li>{{ $t('home_word_practice_desc3') }}</li>
-          </ul>
+          <div>
+            <div class="text-4xl font-bold mb-8">{{ $t('home_word_practice') }}</div>
+            <ul class="p-0 m-0 list-none space-y-2 max-w-80">
+              <li>{{ $t('home_word_practice_desc1') }}</li>
+              <li>{{ $t('home_word_practice_desc2') }}</li>
+              <li>{{ $t('home_word_practice_desc3') }}</li>
+            </ul>
+          </div>
           <div class="flex-1">
             <NuxtImg src="/imgs/words.png" class="rounded-xl w-full" />
           </div>
         </div>
 
-        <div class="text-4xl font-bold mb-8 mt-20 text-right">{{ $t('home_article_practice') }}</div>
-        <div class="flex gap-14 w-full">
+        <div class="flex gap-14 w-full mt-30">
           <div class="flex-1">
             <NuxtImg src="/imgs/articles.png" class="rounded-xl w-full" />
           </div>
-          <ul class="p-0 m-0 list-none space-y-2 max-w-80">
-            <li>{{ $t('home_article_practice_desc1') }}</li>
-            <li>{{ $t('home_article_practice_desc2') }}</li>
-            <li>{{ $t('home_article_practice_desc3') }}</li>
-          </ul>
+          <div>
+            <div class="text-4xl font-bold mb-8  text-right">{{ $t('home_article_practice') }}</div>
+            <ul class="p-0 m-0 list-none space-y-2 max-w-80">
+              <li>{{ $t('home_article_practice_desc1') }}</li>
+              <li>{{ $t('home_article_practice_desc2') }}</li>
+              <li>{{ $t('home_article_practice_desc3') }}</li>
+            </ul>
+          </div>
         </div>
 
         <div class="text-4xl font-bold mb-8 mt-20 text-center">{{ $t('function_desc') }}</div>
@@ -205,7 +206,7 @@ const { locales, setLocale, locale } = useI18n()
 
     <div class="line"></div>
     <div class="w-full center gap-4 h-20">
-      <channel-icons type="horizontal" :share="false" />
+      <ChannelIcons type="horizontal" :share="false" />
       <template v-if="locale === 'zh'">
         <a
           href="https://beian.mps.gov.cn/#/query/webSearch?code=51015602001426"

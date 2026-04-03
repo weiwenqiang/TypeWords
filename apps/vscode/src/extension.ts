@@ -19,7 +19,7 @@ class ChatPanel {
     }
 
     // 创建新面板，放在右侧（使用 ViewColumn.Beside 确保在右侧）
-    const panel = vscode.window.createWebviewPanel(ChatPanel.viewType, '单词练习', vscode.ViewColumn.Beside, {
+    const panel = vscode.window.createWebviewPanel(ChatPanel.viewType, 'New Agent', vscode.ViewColumn.Beside, {
       enableScripts: true,
       localResourceRoots: [],
       retainContextWhenHidden: true,
@@ -53,14 +53,17 @@ class ChatPanel {
     }
   }
 
-  private _update() {
+  private async _update() {
     const webview = this._panel.webview
-    this._panel.webview.html = this._getHtmlForWebview(webview)
+    this._panel.webview.html = await this._getHtmlForWebview(webview)
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
-    const websiteUrl = 'https://typewords.cc'
-    const cdnUrl = 'http://tw.cc'
+  private async _getHtmlForWebview(webview: vscode.Webview) {
+    const cdnUrl = 'https://vs.typewords.cc'
+    const fileUrl = 'https://files.typewords.cc'
+
+    let s = await fetch('https://vs.typewords.cc/vs.json')
+    let r:any = await s.json()
 
     // 生成 nonce 用于 CSP
     const nonce = Buffer.from(Date.now().toString()).toString('base64')
@@ -70,8 +73,9 @@ class ChatPanel {
       "default-src 'none'",
       `script-src 'nonce-${nonce}' ${cdnUrl} 'unsafe-inline'`,
       `style-src ${cdnUrl} 'unsafe-inline'`,
-      `connect-src ${cdnUrl} ${websiteUrl}`,
+      `connect-src ${cdnUrl} ${fileUrl} https://*.supabase.co`,
       'img-src data: https:',
+      'media-src https://dict.youdao.com',
       'font-src data:',
     ].join('; ')
 
@@ -81,11 +85,11 @@ class ChatPanel {
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="${csp}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词练习</title>
+    <title>New Agent</title>
 
 
-  <script type="module" crossorigin src="${cdnUrl}/assets/index-BKse0Hmq.js"></script>
-  <link rel="stylesheet" crossorigin href="${cdnUrl}/assets/index-B6wzG-8R.css">
+  <script type="module" src="${cdnUrl}/${r.js}"></script>
+  <link rel="stylesheet" href="${cdnUrl}/${r.css}">
 </head>
 <body>
     <div id="app"></div>
@@ -94,19 +98,11 @@ class ChatPanel {
   }
 }
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  const disposable = vscode.commands.registerCommand('typewords.helloWorld', () => {
-    vscode.window.showInformationMessage('Hello World from TypeW123123ords!')
-  })
-
-  // 打开聊天面板命令
+export async function activate(context: vscode.ExtensionContext) {
   const openChatDisposable = vscode.commands.registerCommand('typewords.openChat', () => {
     ChatPanel.createOrShow(context.extensionUri)
   })
-
-  context.subscriptions.push(disposable, openChatDisposable)
+  context.subscriptions.push(openChatDisposable)
 }
 
 // This method is called when your extension is deactivated

@@ -1,36 +1,48 @@
 <script setup lang="tsx">
-import { detail } from '@/apis'
-import BackIcon from '@/components/BackIcon.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseIcon from '@/components/BaseIcon.vue'
-import BasePage from '@/components/BasePage.vue'
-import BaseTable from '@/components/BaseTable.vue'
-import PopConfirm from '@/components/PopConfirm.vue'
-import WordItem from '@/components/WordItem.vue'
-import BaseInput from '@/components/base/BaseInput.vue'
-import Textarea from '@/components/base/Textarea.vue'
-import Form from '@/components/base/form/Form.vue'
-import FormItem from '@/components/base/form/FormItem.vue'
-import Toast from '@/components/base/toast/Toast.ts'
-import DeleteIcon from '@/components/icon/DeleteIcon.vue'
-import { AppEnv, DictId, LIB_JS_URL, TourConfig } from '@/config/env.ts'
-import { getCurrentStudyWord } from '@/hooks/dict.ts'
-import EditBook from '~/components/article/EditBook.vue'
-import PracticeSettingDialog from '~/components/word/PracticeSettingDialog.vue'
-import { useBaseStore } from '@/stores/base.ts'
-import { useRuntimeStore } from '@/stores/runtime.ts'
-import { useSettingStore } from '@/stores/setting.ts'
-import { getDefaultDict } from '@/types/func.ts'
-import { _getDictDataByUrl, _nextTick, convertToWord, isMobile, loadJsLib, reverse, shuffle, useNav } from '@/utils'
-import { MessageBox } from '@/utils/MessageBox.tsx'
+import { detail } from '@typewords/core/apis'
+import {
+  BackIcon,
+  BaseButton,
+  BaseIcon,
+  BaseInput,
+  BasePage,
+  DeleteIcon,
+  Form,
+  FormItem,
+  PopConfirm,
+  Textarea,
+  Toast,
+} from '@typewords/base'
+import BaseTable from '@typewords/core/components/BaseTable.vue'
+import WordItem from '@typewords/core/components/word/WordItem.vue'
+import { AppEnv, DictId, LIB_JS_URL, TourConfig } from '@typewords/core/config/env.ts'
+import { getCurrentStudyWord } from '@typewords/core/hooks/dict.ts'
+import EditBook from '@typewords/core/components/article/EditBook.vue'
+import PracticeSettingDialog from '@typewords/core/components/word/PracticeSettingDialog.vue'
+import { useBaseStore } from '@typewords/core/stores/base.ts'
+import { useRuntimeStore } from '@typewords/core/stores/runtime.ts'
+import { useSettingStore } from '@typewords/core/stores/setting.ts'
+import { getDefaultDict, getDefaultWord } from '@typewords/core/types/func.ts'
+import {
+  _getDictDataByUrl,
+  _nextTick,
+  convertToWord,
+  isMobile,
+  loadJsLib,
+  reverse,
+  shuffle,
+  useNav,
+} from '@typewords/core/utils'
+import { MessageBox } from '@typewords/core/utils/MessageBox.tsx'
 import { nanoid } from 'nanoid'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { wordDelete } from '@/apis/words.ts'
-import { copyOfficialDict } from '@/apis/dict.ts'
-import { PRACTICE_WORD_CACHE } from '@/utils/cache.ts'
-import { Sort, WordPracticeMode } from '@/types/enum.ts'
+import { wordDelete } from '@typewords/core/apis/words.ts'
+import { copyOfficialDict } from '@typewords/core/apis/dict.ts'
+import { PRACTICE_WORD_CACHE } from '@typewords/core/utils/cache.ts'
+import { Sort, WordPracticeMode } from '@typewords/core/types/enum.ts'
+import saveAs from 'file-saver'
 
 const runtimeStore = useRuntimeStore()
 const base = useBaseStore()
@@ -279,7 +291,7 @@ async function startPractice(query = {}) {
   if (![WordPracticeMode.Free, WordPracticeMode.System].includes(settingStore.wordPracticeMode)) {
     settingStore.wordPracticeMode = WordPracticeMode.System
   }
-  console.log(1)
+  // console.log(1)
   localStorage.removeItem(PRACTICE_WORD_CACHE.key)
   studyLoading = true
   await base.changeDict(runtimeStore.editDict)
@@ -300,11 +312,7 @@ async function addMyStudyList() {
   if (!runtimeStore.editDict.words.length) {
     return Toast.warning('没有单词可学习！')
   }
-  if (!settingStore.disableShowPracticeSettingDialog) {
-    showPracticeSettingDialog = true
-    return
-  }
-  startPractice()
+  showPracticeSettingDialog = true
 }
 
 async function startTest() {
@@ -318,46 +326,124 @@ async function startTest() {
   nav('words-test/' + store.sdict.id, {}, {})
 }
 
-let exportLoading = $ref(false)
+let exportXlsxLoading = $ref(false)
+let exportJsonLoading = $ref(false)
+
 let importLoading = $ref(false)
 let tableRef = ref()
 
-function importData(e) {
-  let file = e.target.files[0]
-  if (!file) return
+function importXlsxData(e) {
+  if (!importLoading) {
+    let file = e.target.files[0]
+    if (!file) return
 
-  let reader = new FileReader()
-  reader.onload = async function (s) {
-    let data = s.target.result
-    importLoading = true
-    const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX)
-    let workbook = XLSX.read(data, { type: 'binary' })
-    let res: any[] = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1'])
-    if (res.length) {
-      let words = res
-        .map(v => {
-          if (v['单词']) {
-            let data = null
-            try {
-              data = convertToWord({
-                id: nanoid(6),
-                word: v['单词'],
-                phonetic0: v['音标①'] ?? '',
-                phonetic1: v['音标②'] ?? '',
-                trans: v['翻译'] ?? '',
-                sentences: v['例句'] ?? '',
-                phrases: v['短语'] ?? '',
-                synos: v['近义词'] ?? '',
-                relWords: v['同根词'] ?? '',
-                etymology: v['词源'] ?? '',
-              })
-            } catch (e) {
-              console.error('导入单词报错' + v['单词'], e.message)
+    let reader = new FileReader()
+    reader.onload = async function (s) {
+      let data = s.target.result
+      importLoading = true
+      const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX)
+      let workbook = XLSX.read(data, { type: 'binary' })
+      let res: any[] = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1'])
+      if (res.length) {
+        let words = res
+          .map(v => {
+            if (v['单词']) {
+              let data = null
+              try {
+                data = convertToWord({
+                  id: nanoid(6),
+                  word: v['单词'],
+                  phonetic0: v['音标①'] ?? '',
+                  phonetic1: v['音标②'] ?? '',
+                  trans: v['翻译'] ?? '',
+                  sentences: v['例句'] ?? '',
+                  phrases: v['短语'] ?? '',
+                  synos: v['近义词'] ?? '',
+                  relWords: v['同根词'] ?? '',
+                  etymology: v['词源'] ?? '',
+                })
+              } catch (e) {
+                console.error('导入单词报错' + v['单词'], e.message)
+              }
+              return data
             }
-            return data
+          })
+          .filter(v => v)
+        if (words.length) {
+          let repeat = []
+          let noRepeat = []
+          words.map((v: any) => {
+            let rIndex = runtimeStore.editDict.words.findIndex(s => s.word === v.word)
+            if (rIndex > -1) {
+              v.index = rIndex
+              repeat.push(v)
+            } else {
+              noRepeat.push(v)
+            }
+          })
+
+          runtimeStore.editDict.words = runtimeStore.editDict.words.concat(noRepeat)
+
+          if (repeat.length) {
+            MessageBox.confirm(
+              '单词"' + repeat.map(v => v.word).join(', ') + '" 已存在，是否覆盖原单词？',
+              '检测到重复单词',
+              () => {
+                repeat.map(v => {
+                  runtimeStore.editDict.words[v.index] = v
+                  delete runtimeStore.editDict.words[v.index]['index']
+                })
+              },
+              null,
+              () => {
+                tableRef.value.closeImportDialog()
+                e.target.value = ''
+                importLoading = false
+                allList = runtimeStore.editDict.words
+                tableRef.value.getData()
+                syncDictInMyStudyList()
+                Toast.success('导入成功！')
+              },
+              { t: $t }
+            )
+          } else {
+            tableRef.value.closeImportDialog()
+            e.target.value = ''
+            importLoading = false
+            allList = runtimeStore.editDict.words
+            tableRef.value.getData()
+            syncDictInMyStudyList()
+            Toast.success('导入成功！')
           }
+        } else {
+          Toast.warning('导入失败！原因：没有数据/未认别到数据')
+        }
+      } else {
+        Toast.warning('导入失败！原因：没有数据')
+      }
+      e.target.value = ''
+      importLoading = false
+    }
+    reader.readAsBinaryString(file)
+  }
+}
+
+function importJsonData(e) {
+  if (!importLoading) {
+    let file = e.target.files[0]
+    if (!file) return
+
+    let reader = new FileReader()
+    reader.onload = async function (s) {
+      let data = s.target.result
+      let res: any[] = JSON.parse(data.toString())
+      console.log(res)
+      let words = res
+        .filter(v => v.word)
+        .map(v => {
+          return getDefaultWord(v)
         })
-        .filter(v => v)
+
       if (words.length) {
         let repeat = []
         let noRepeat = []
@@ -407,17 +493,14 @@ function importData(e) {
       } else {
         Toast.warning('导入失败！原因：没有数据/未认别到数据')
       }
-    } else {
-      Toast.warning('导入失败！原因：没有数据')
     }
-    e.target.value = ''
-    importLoading = false
+    reader.readAsText(file)
   }
-  reader.readAsBinaryString(file)
 }
 
-async function exportData() {
-  exportLoading = true
+async function exportXlsxData() {
+  if (exportXlsxLoading) return
+  exportXlsxLoading = true
   const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX)
   let list = runtimeStore.editDict.words
   let filename = runtimeStore.editDict.name
@@ -440,7 +523,20 @@ async function exportData() {
   wb.SheetNames = ['Sheet1']
   XLSX.writeFile(wb, `${filename}.xlsx`)
   Toast.success(filename + ' 导出成功！')
-  exportLoading = false
+  exportXlsxLoading = false
+}
+
+async function exportJsonData() {
+  if (exportJsonLoading) return
+  exportJsonLoading = true
+  let list = runtimeStore.editDict.words.map(w => {
+    delete w.custom
+    delete w.id
+    return w
+  })
+  const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' })
+  saveAs(blob, `${runtimeStore.editDict.name}.json`)
+  exportJsonLoading = false
 }
 
 watch(
@@ -618,9 +714,12 @@ defineRender(() => {
                 onDel={batchDel}
                 onSort={onSort}
                 onAdd={addWord}
-                onImport={importData}
-                onExport={exportData}
-                exportLoading={exportLoading}
+                onImportXlsx={importXlsxData}
+                onImportJson={importJsonData}
+                onExportXlsx={exportXlsxData}
+                onExportJson={exportJsonData}
+                exportXlsxLoading={exportXlsxLoading}
+                exportJsonLoading={exportJsonLoading}
                 importLoading={importLoading}
               >
                 {val => (
